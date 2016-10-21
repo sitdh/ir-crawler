@@ -6,42 +6,34 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-db = MySQLDatabase(config.get('DATABASE', 'dbname', fallback='test'),
-        host=config.get('DATABASE', 'localhost', fallback='localhost'),
-        user=config.get('DATABASE', 'user', fallback='user'),
-        password=config.get('DATABASE', 'password', fallback='password'),
-        )
+database = MySQLDatabase(config.get('DATABASE', 'dbname', fallback='test'),
+            host=config.get('DATABASE', 'localhost', fallback='localhost'),
+            user=config.get('DATABASE', 'user', fallback='user'),
+            password=config.get('DATABASE', 'password', fallback='password'),
+            )
 
-class Course(Model):
+class BaseModel(Model):
+    class Meta:
+        database = database
+        db_table = 'course'
+
+class Course(BaseModel):
     course_id = BigIntegerField(primary_key=True)
     course_description = TextField()
     language = CharField()
     level = CharField()
     overall_rating = DecimalField()
 
-    class Meta:
-        database = db
-        db_table = 'course'
-
-class Document(Model):
+class Document(BaseModel):
     document_id = BigIntegerField(primary_key=True)
     document_title = CharField()
 
-    class Meta:
-        database = db
-        db_table = 'document'
-
-class Review(Model):
+class Review(BaseModel):
     review_id = BigIntegerField(primary_key=True)
     reviewer = CharField()
     rating = IntegerField()
     comment = TextField()
     course = ForeignKeyField(Course, related_name='reviews')
-
-    class Meta:
-        database = db
-        db_table = 'review'
-
 
 if __name__ == '__main__':
     if not Course.table_exists():
@@ -52,5 +44,3 @@ if __name__ == '__main__':
 
     if not Review.table_exists():
         Review.create_table()
-
-
