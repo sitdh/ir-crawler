@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 attrs==16.2.0
 cffi==1.8.3
 cryptography==1.5.2
