@@ -28,6 +28,7 @@ class Course(BaseModel):
     overall_rating = DecimalField()
     course_url = CharField()
     cover_image = CharField()
+    source = CharField()
 
 # class Document(BaseModel):
 #     document_id = BigIntegerField(primary_key=True)
