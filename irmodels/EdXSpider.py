@@ -2,6 +2,7 @@
 import re
 import scrapy
 import uuid
+import json
 
 from scrapy.selector import Selector
 
@@ -16,7 +17,7 @@ class EdXSpider(scrapy.Spider):
     name = 'edx'
 
     start_urls = [
-            'https://www.edx.org/xseries/java-android-beginners',
+            # 'https://www.edx.org/course/css-introduction-w3cx-css-0x',
             'https://www.edx.org/course/introduction-c-microsoft-dev210x-1',
             'https://www.edx.org/course/machine-learning-columbiax-csmm-102x',
             'https://www.edx.org/course/think-create-code-adelaidex-code101x-2',
@@ -70,33 +71,19 @@ class EdXSpider(scrapy.Spider):
             ]
 
     def parse(self, response):
-        course_title = response.css('h1#course-intro-heading::text').extract_first().strip()
-        # enrolled_information = response.css('span.rating-and-enrolled__element').extract()
-
-        # rating = [x.strip() for x in response.css('span.rate-count>span.tooltip-container::text').extract_first().strip().split("\n")]
-        skill_level = response.css('div#course-summary-area li:nth-child(6) span.block-list__desc::text').extract_first()
-
-        course_thumbnail = response.css('div.course-detail-video a.video-link img').extract_first()
-        course_thumbnail = course_thumbnail[course_thumbnail.find('"')+1:].replace('">','').strip()
-
-        course_description = response.css('div#desc').extract_first()
-        course_description = re.sub(cleanr, '', course_description).replace("\n\n", '').replace("  ", ' ').strip()
-
-        overall_rating = float(rating[0].replace(',', ''))
-        ratings = float(rating[-1].replace('ratings)', '').replace('(','').replace(',','').strip())
-        student_enrolled = 0 # re.sub(cleanr, '', enrolled_information[2].replace('students enrolled', '').strip()).strip()
-        student_enrolled = 0 # int(student_enrolled.replace(',', ''))
+        course_info = response.css('script[class="js-schema"]::text').extract_first()
+        course_info = json.loads(course_info)
 
         Course.create(
                 course_id = uuid.uuid4(), 
-                course_title = course_title, 
-                course_description = course_description, 
+                course_title = course_info['@graph'][1]['name'], 
+                course_description = course_info['@graph'][1]['description'], 
                 language = 'English', 
-                level = skill_level, 
-                student_enrolled = student_enrolled, 
-                ratings = ratings, 
-                overall_rating = overall_rating, 
+                level = 'All level', 
+                student_enrolled = 0, 
+                ratings = 0, 
+                overall_rating = 0, 
                 course_url = response.url, 
-                cover_image = course_thumbnail,
+                cover_image = course_info['@graph'][1]['image']['url'],
                 source = 'edx'
                 )
