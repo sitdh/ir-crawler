@@ -91,3 +91,6 @@ ENV/
 env/
 *.swp
 __pycache__/
+
+.vagrant/
+*.log
