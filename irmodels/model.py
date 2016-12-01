@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# vim:fileencoding=utf-8
+
 from peewee import *
 from playhouse.db_url import connect
 
@@ -29,6 +32,23 @@ class Course(BaseModel):
     course_url = CharField()
     cover_image = CharField()
     source = CharField()
+
+    def dictionary(self):
+        data = {
+                'course_id': "{0!s}".format(self.course_id),
+                'course_title': "{0!s}".format(self.course_title),
+                'course_description': "{0!s}".format(self.course_description),
+                'language' = "{0!s}".format(self.language),
+                'level' = "{0!s}".format(self.level),
+                "student_enrolled" = "{0!s}".format(self.student_enrolled),
+                "ratings" = "{0!s}".format(self.rating),
+                "overall_rating" = "{0!s}".format(self.overall_rating),
+                "course_url" = "{0!s}".format(self.course_url),
+                "cover_image" = "{0!s}".format(self.cover_image),
+                "source" = self.source
+                }
+
+        return data
 
 # class Document(BaseModel):
 #     document_id = BigIntegerField(primary_key=True)
